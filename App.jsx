@@ -7,8 +7,12 @@ import {
   FlatList,
   Linking
 } from 'react-native';
+import { Provider } from 'react-redux';
 import * as Permissions from 'expo-permissions';
 import * as Contacts from 'expo-contacts';
+import createStore from './store';
+
+const store = createStore();
 
 export default function App() {
   const [contacts, setContacts] = useState([]);
@@ -21,7 +25,7 @@ export default function App() {
 
   const showContacts = async () => {
     const contactsList = await Contacts.getContactsAsync();
-    setContacts(contactsList.data);
+    props.setContacts(contactsList.data);
   };
 
   const call = contact => {
@@ -40,18 +44,20 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Button title="Get Contacts" onPress={showContacts} />
-      <FlatList
-        // data={[{ id: 1, title: 'one' }, { id: 2, title: 'two' }]}
-        data={contacts}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <Button title={item.name} onPress={() => call(item)} />
-        )}
-      />
-    </View>
+    <Provider store={store}>
+      <View style={styles.container}>
+        <Text>Open up App.js to start working on your app!</Text>
+        <Button title="Get Contacts" onPress={showContacts} />
+        <FlatList
+          // data={[{ id: 1, title: 'one' }, { id: 2, title: 'two' }]}
+          data={contacts}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <Button title={item.name} onPress={() => call(item)} />
+          )}
+        />
+      </View>
+    </Provider>
   );
 }
 
